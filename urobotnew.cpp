@@ -48,25 +48,30 @@ int mapone[10][10] =  //changemap at
 int map[10][10] = 
 {   //0 1 2 3 4 5 6 7 8 9
     {1,1,1,1,1, 1,1,1,1,1},//0
-    {1,1,1,1,1, 9,1,1,1,1},//1
-    {1,1,1,1,1, 6,1,1,1,1},//2
-    {1,1,1,9,1, 1,1,1,1,1},//3
-    {1,1,1,1,1, 1,6,1,9,1},//4
+    {1,9,1,1,1, 9,1,1,1,1},//1
+    {1,1,9,1,1, 1,1,1,1,1},//2
+    {1,1,6,1,1, 1,1,1,1,1},//3
+    {1,1,6,1,1, 1,1,1,1,1},//4
     
-    {1,1,6,6,1, 1,1,1,1,1},//5
-    {1,1,1,1,1, 9,1,1,1,1},//6
+    {1,1,1,1,1, 1,1,1,1,1},//5
+    {1,1,1,1,1, 1,1,1,1,1},//6
     {1,1,1,1,1, 1,1,1,1,1},//7
-    {1,1,1,1,1, 1,1,1,1,1},//8
+    {1,1,1,6,9, 6,1,1,1,1},//8
     {1,1,1,1,1, 1,1,1,1,1} //9
 };
 
 /*
 void checkblock(int x,int y);
-int checkx(int x,int i);
-int checky(int y,int i);
+
 void checkmap();
 int ultrasonic(int x,int y);
 */
+int checkxf(int x);
+int checkyf(int y);
+int checkxl(int x);
+int checkyl(int y);
+int checkxr(int x);
+int checkyr(int y);
 
 void printmap(int map[][10]);
 void printxy(int x,int y);
@@ -96,7 +101,7 @@ int main(){
     findone();
     printxy(x,y);
     printxy(bx,by);
-    for(int i=0;i<10;i++){
+    for(int i=0;i<15;i++){
         changeone(bx,by);
     }     
     printmap(mapone);
@@ -106,8 +111,9 @@ int main(){
             break; //keepblock
         }else{
             move();
+            printxy(x,y);
         }        
-        printxy(x,y);
+        
     }
     printf("keep block\n");
     status = 1;
@@ -117,7 +123,7 @@ int main(){
     by=7;
     printxy(x,y);
     printxy(bx,by);
-    for(int i=0;i<10;i++){
+    for(int i=0;i<15;i++){
         changeone(bx,by);
     }  
     printmap(mapone);
@@ -375,36 +381,19 @@ int min4(int a, int b, int c, int d)
 //////////////////////////////move to goal
 void move(){
     int checkw=0;
-    if (mapone[x-1][y] == 99 || checkoor(x-1,y)) checkw += 1; //#front
-    if (mapone[x][y-1] == 99 || checkoor(x,y-1)) checkw += 2; //#left
-    if (mapone[x][y+1] == 99 || checkoor(x,y+1)) checkw += 4; //#right
+    if (mapone[checkxf(x)][checkyf(y)] == 99 || checkoor(checkxf(x),checkyf(y))) checkw += 1; //#front
+    if (mapone[checkxl(x)][checkyl(y)] == 99 || checkoor(checkxl(x),checkyl(y))) checkw += 2; //#left
+    if (mapone[checkxr(x)][checkyr(y)] == 99 || checkoor(checkxr(x),checkyr(y))) checkw += 4; //#right
     switch(checkw){
-        case 0:
-            switch(di){
-                case 0:min3way(mapone[x - 1][y], mapone[x][y - 1], mapone[x][y + 1]);break;
-                case 1:min3way(mapone[x][y - 1], mapone[x + 1][y], mapone[x - 1][y]);break;
-                case 2:min3way(mapone[x][y + 1], mapone[x - 1][y], mapone[x + 1][y]);break;
-                default:min3way(mapone[x + 1][y], mapone[x][y + 1], mapone[x][y - 1]);break;                
-            }break;
-        case 1:switch(di){
-                case 0:min2way(mapone[x][y - 1], mapone[x][y + 1],1);break;
-                case 1:min2way(mapone[x + 1][y], mapone[x - 1][y],1);break;
-                case 2:min2way(mapone[x - 1][y], mapone[x + 1][y],1);break;
-                default:min2way(mapone[x][y + 1], mapone[x][y - 1],1);break;                
-            }break;
-        case 2:switch(di){
-                case 0:min2way(mapone[x - 1][y], mapone[x][y + 1],2);break;
-                case 1:min2way(mapone[x][y - 1], mapone[x - 1][y],2);break;
-                case 2:min2way(mapone[x][y + 1], mapone[x + 1][y],2);break;
-                default:min2way(mapone[x + 1][y], mapone[x][y - 1],2);break;                
-            }break;
+        case 0: min3way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxl(x)][checkyl(y)] , mapone[checkxr(x)][checkyr(y)]);
+            break;
+        case 1: min2way(mapone[checkxl(x)][checkyl(y)] , mapone[checkxr(x)][checkyr(y)],1);
+            break;
+        case 2: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxr(x)][checkyr(y)],2);
+            break;
         case 3:right();front();break;
-        case 4:switch(di){
-                case 0:min2way(mapone[x - 1][y], mapone[x][y - 1],4);break;
-                case 1:min2way(mapone[x][y - 1], mapone[x + 1][y],4);break;
-                case 2:min2way(mapone[x][y + 1], mapone[x - 1][y],4);break;
-                default:min2way(mapone[x + 1][y], mapone[x][y + 1],4);break;                
-            }break;
+        case 4: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxl(x)][checkyl(y)],4);
+            break;
         case 5:left();front();break;
         case 6:front();break;
         default:left();left();front();break;
@@ -418,17 +407,18 @@ void min2way(int a, int b,int checkw)
 		switch (checkw)
 		{
 		case 1:
-            if(status = 0){
-                left();
-            } 
-            else if(status = 1){
-                check1 = checkleft(x,y);
-                switch(check1){
-                    case 1:left();break;
-                    case 2:right();right();right();break;
-                    default:break;
-                }    
-            }           
+            // if(status = 0){
+            //     left();
+            // } 
+            // else if(status = 1){
+            //     check1 = checkleft(x,y);
+            //     switch(check1){
+            //         case 1:left();break;
+            //         case 2:right();right();right();break;
+            //         default:break;
+            //     }    
+            // }    
+            left();       
             front();break; //left,right				
 		case 2: front();break; //front,right
 		default: front();break;//front,left
@@ -441,17 +431,19 @@ void min2way(int a, int b,int checkw)
 		case 1:	right();front();break; //left,right
 		case 2: right();front();break; //front,right
 		default: 
-            if(status = 0){
-                left();
-            } 
-            else if(status = 1){
-                check1 = checkleft(x,y);
-                switch(check1){
-                    case 1:left();break;
-                    case 2:right();right();right();break;
-                    default:break;
-                }    
-            }front();break; //front,left			
+            // if(status = 0){
+            //     left();
+            // } 
+            // else if(status = 1){
+            //     check1 = checkleft(x,y);
+            //     switch(check1){
+            //         case 1:left();break;
+            //         case 2:right();right();right();break;
+            //         default:break;
+            //     }    
+            // }
+            left();
+            front();break; //front,left			
 		}		
 	}
 }
@@ -466,17 +458,18 @@ void min3way(int a, int b, int c)
 		}
 		else if (b < a && b < c)
 		{ //go left
-			if(status = 0){
-                left();
-            } 
-            else if(status = 1){
-                check1 = checkleft(x,y);
-                switch(check1){
-                    case 1:left();break;
-                    case 2:right();right();right();break;
-                    default:break;
-                }    
-            } 
+			// if(status = 0){
+            //     left();
+            // } 
+            // else if(status = 1){
+            //     check1 = checkleft(x,y);
+            //     switch(check1){
+            //         case 1:left();break;
+            //         case 2:right();right();right();break;
+            //         default:break;
+            //     }    
+            // }
+            left(); 
             front();
 		}
 		else
@@ -488,6 +481,58 @@ void min3way(int a, int b, int c)
 	{
 		front();
 	}
+}
+
+//front
+int checkxf(int x){
+    switch(di){
+        case 0: return x-1;
+        case 1: return x;
+        case 2: return x;
+        default: return x+1;
+    }
+}
+int checkyf(int y){
+    switch(di){
+        case 0: return y;
+        case 1: return y-1;
+        case 2: return y+1;
+        default: return y;
+    }
+}
+//left
+int checkxl(int x){
+    switch(di){
+        case 0: return x;
+        case 1: return x+1;
+        case 2: return x-1;
+        default: return x;
+    }
+}
+int checkyl(int y){
+    switch(di){
+        case 0: return y-1;
+        case 1: return y;
+        case 2: return y;
+        default: return y+1;
+    }
+}
+//right
+int checkxr(int x){
+    switch(di){
+        case 0: return x;
+        case 1: return x-1;
+        case 2: return x+1;
+        default: return x;
+    }
+}
+int checkyr(int y){
+    switch(di){
+        case 0: return y+1;
+        case 1: return y;
+        case 2: return y;
+        default: return y-1;
+    }
 }
 
 /*
