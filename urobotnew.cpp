@@ -409,9 +409,29 @@ int min4(int a, int b, int c, int d)
 //////////////////////////////move to goal
 void move(){
     int checkw=0;
-    if (mapone[checkxf(x)][checkyf(y)] == 99 || checkoor(checkxf(x),checkyf(y))) checkw += 1; //#front
-    if (mapone[checkxl(x)][checkyl(y)] == 99 || checkoor(checkxl(x),checkyl(y))) checkw += 2; //#left
-    if (mapone[checkxr(x)][checkyr(y)] == 99 || checkoor(checkxr(x),checkyr(y))) checkw += 4; //#right
+    if(checkoor(checkxf(x),checkyf(y))){
+        checkw += 1; //front
+    }else{
+        if (mapone[checkxf(x)][checkyf(y)] == 99 ){
+           checkw += 1; //front 
+        }
+    }
+
+    if(checkoor(checkxl(x),checkyl(y))){
+        checkw += 2; //left
+    }else{
+        if (mapone[checkxl(x)][checkyl(y)] == 99){
+            checkw += 2; //left
+        }
+    }
+
+    if(checkoor(checkxr(x),checkyr(y))){
+        checkw += 4; //right
+    }else{
+        if (mapone[checkxr(x)][checkyr(y)] == 99){
+            checkw += 4; //right
+        }
+    }    
     switch(checkw){
         case 0: min3way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxl(x)][checkyl(y)] , mapone[checkxr(x)][checkyr(y)]);
             break;
