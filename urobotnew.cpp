@@ -89,6 +89,7 @@ int min4(int a, int b, int c, int d);
 void move();
 void min2way(int a, int b,int checkw);
 void min3way(int a, int b, int c);
+void prekeep(int bx ,int by);
 
 void clearmap();
 void movewbox1();
@@ -115,9 +116,10 @@ int main(){
         }        
         
     }
+    prekeep(bx,by);
     printf("keep block\n");
     status = 1;
-    left();left();
+
     //find goal
     bx=1;
     by=7;
@@ -416,7 +418,6 @@ void move(){
            checkw += 1; //front 
         }
     }
-
     if(checkoor(checkxl(x),checkyl(y))){
         checkw += 2; //left
     }else{
@@ -424,7 +425,6 @@ void move(){
             checkw += 2; //left
         }
     }
-
     if(checkoor(checkxr(x),checkyr(y))){
         checkw += 4; //right
     }else{
@@ -580,6 +580,18 @@ int checkyr(int y){
         case 1: return y;
         case 2: return y;
         default: return y-1;
+    }
+}
+
+void prekeep(int bx ,int by){
+    if(checkxf(x) == bx && checkyf(y) == by){
+    }else if(checkxl(x) == bx && checkyl(y) == by){
+        left();
+    }else if(checkxr(x) == bx && checkyr(y) == by){
+        right();
+    }else{
+        left();
+        left();
     }
 }
 
