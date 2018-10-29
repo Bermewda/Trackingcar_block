@@ -250,10 +250,38 @@ int checkoor(int x,int y){
 }
 int checkwall(int x,int y){
     int checkw=0;
-    if (mapone[x-1][y] == 99 || checkoor(x-1,y)) checkw += 1; //#front
-    if (mapone[x][y-1] == 99 || checkoor(x,y-1)) checkw += 2; //#left
-    if (mapone[x][y+1] == 99 || checkoor(x,y+1)) checkw += 4; //#right
-    if (mapone[x+1][y] == 99 || checkoor(x+1,y)) checkw += 8; //#back
+
+    if(checkoor(x-1,y)){
+        checkw += 1;//front
+    }else{
+        if (mapone[x-1][y] == 99) {
+            checkw += 1;//front
+        }
+    }
+
+    if(checkoor(x,y-1)){
+        checkw += 2;//left
+    }else{
+        if (mapone[x][y-1] == 99) {
+            checkw += 2;//left
+        }
+    }
+
+    if(checkoor(x,y+1)){
+        checkw += 4;//front
+    }else{
+        if (mapone[x][y+1] == 99) {
+            checkw += 4;//right
+        }
+    }
+
+    if(checkoor(x+1,y)){
+        checkw += 8;//front
+    }else{
+        if (mapone[x+1][y] == 99) {
+            checkw += 8;//back
+        }
+    }
     return checkw;
 }
 void changeone(int bx,int by)
