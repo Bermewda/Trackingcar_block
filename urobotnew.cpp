@@ -48,15 +48,15 @@ int mapone[10][10] =  //changemap at
 int map[10][10] = 
 {   //0 1 2 3 4 5 6 7 8 9
     {1,1,1,1,1, 1,1,1,1,1},//0
-    {1,9,1,1,1, 9,1,1,1,1},//1
-    {1,1,9,1,1, 1,1,1,1,1},//2
+    {1,1,9,1,1, 1,9,1,9,1},//1
+    {1,1,1,1,1, 1,1,1,1,1},//2
     {1,1,6,1,1, 1,1,1,1,1},//3
     {1,1,6,1,1, 1,1,1,1,1},//4
     
     {1,1,1,1,1, 1,1,1,1,1},//5
-    {1,1,1,1,1, 1,1,1,1,1},//6
+    {1,1,1,1,1, 9,1,1,1,1},//6
     {1,1,1,1,1, 1,1,1,1,1},//7
-    {1,1,1,6,9, 6,1,1,1,1},//8
+    {1,1,1,6,1, 6,1,1,1,1},//8
     {1,1,1,1,1, 1,1,1,1,1} //9
 };
 
@@ -72,6 +72,17 @@ int checkxl(int x);
 int checkyl(int y);
 int checkxr(int x);
 int checkyr(int y);
+int checkxb(int x);
+int checkyb(int y);
+
+int checkxne(int x);
+int checkyne(int y);
+int checkxnw(int x);
+int checkynw(int y);
+int checkxse(int x);
+int checkyse(int y);
+int checkxsw(int x);
+int checkysw(int y);
 
 void printmap(int map[][10]);
 void printxy(int x,int y);
@@ -91,9 +102,10 @@ void min2way(int a, int b,int checkw);
 void min3way(int a, int b, int c);
 void prekeep(int bx ,int by);
 
-void clearmap();
-void movewbox1();
-int checkleft(int x, int y);
+void checkleftbox1(int x, int y);
+void checkrightbox1(int x, int y);
+
+int checkplace(int bx,int by); //check place around box
 //****block (1,7) (7,2) (5,6)(6,6)****//
 
 int main(){
@@ -130,14 +142,17 @@ int main(){
     }  
     printmap(mapone);
 
-    while(x!=bx || y!=by){
-        // if(mapone[x][y]==1){
-        //     break; //keepblock
-        // }else{
-            movewbox1();
-            //move(); //move with block
-        //}        
-        printxy(x,y);
+    //int count =0;
+    while(x!=bx || y!=by)
+    //while(count != 20)
+    {
+        if(mapone[x][y]==1){
+            break; //keepblock
+        }else{
+            move();
+            printxy(x,y);
+        }  
+       // count++;
     }
  
     return 0;
@@ -155,6 +170,7 @@ void printmap(int map[][10]){
     }
     printf("\n");
 }
+
 void printxy(int x,int y){
     printf("%d : (%d,%d)\n",di,x,y);
 }
@@ -189,58 +205,6 @@ void findwall(int bx,int by){
     //wall[bx][by]=0;
     mapone[bx][by]=0;
 }
-
-/*
-void checkblock(int x,int y){    
-    if(ultra >= 6 && ultra <= 18){
-        map[checkx(x,0)][checky(y,0)]=1;
-        map[checkx(x,1)][checky(y,1)]=4;        
-    }
-    else if(ultra >= 36 && ultra <= 47){
-        map[checkx(x,0)][checky(y,0)]=1;
-        map[checkx(x,1)][checky(y,1)]=1;
-        map[checkx(x,2)][checky(y,2)]=4;        
-    }
-    else if(ultra >= 65 && ultra <= 78){
-        map[checkx(x,0)][checky(y,0)]=1;
-        map[checkx(x,1)][checky(y,1)]=1;
-        map[checkx(x,2)][checky(y,2)]=1;
-        map[checkx(x,3)][checky(y,3)]=4;        
-    }
-    else if(ultra >= 87 && ultra <= 107){
-        map[checkx(x,0)][checky(y,0)]=1;
-        map[checkx(x,1)][checky(y,1)]=1;
-        map[checkx(x,2)][checky(y,2)]=1;
-        map[checkx(x,3)][checky(y,3)]=1;
-        map[checkx(x,4)][checky(y,4)]=4;        
-    }
-    else{
-        for(int i=0;i<=4;i++){ 
-            if( checkx(x,i)>=0 && checkx(x,i)<=7 && checky(y,i)>=0 && checky(y,i)<=7 )      
-            {
-                map[checkx(x,i)][checky(y,i)]=1;
-            }
-        }
-    }
-}
-
-int checkx(int x,int i){
-    switch(di){
-        case 0: return x-i;
-        case 1: return x;
-        case 2: return x;
-        default: return x+i;
-    }
-}
-int checky(int y,int i){
-    switch(di){
-        case 0: return y;
-        case 1: return y-i;
-        case 2: return y+i;
-        default: return y;
-    }
-}
-*/
 
 ////////////////////////////// change map
 int checkoor(int x,int y){
@@ -412,23 +376,29 @@ int min4(int a, int b, int c, int d)
 void move(){
     int checkw=0;
     if(checkoor(checkxf(x),checkyf(y))){
+        //printf("fwall\n");
         checkw += 1; //front
     }else{
         if (mapone[checkxf(x)][checkyf(y)] == 99 ){
+           // printf("fwall\n");
            checkw += 1; //front 
         }
     }
     if(checkoor(checkxl(x),checkyl(y))){
+        //printf("lwall\n");
         checkw += 2; //left
     }else{
         if (mapone[checkxl(x)][checkyl(y)] == 99){
+            //printf("lwall\n");
             checkw += 2; //left
         }
     }
     if(checkoor(checkxr(x),checkyr(y))){
+        //printf("rwall\n");
         checkw += 4; //right
     }else{
         if (mapone[checkxr(x)][checkyr(y)] == 99){
+            //printf("rwall\n");
             checkw += 4; //right
         }
     }    
@@ -439,35 +409,45 @@ void move(){
             break;
         case 2: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxr(x)][checkyr(y)],2);
             break;
-        case 3:right();front();break;
+        case 3:
+            if(status = 0){
+                right();front();
+            } 
+            else if(status = 1){
+                checkrightbox1(x,y);   
+            }
+            // right();
+            break;
         case 4: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxl(x)][checkyl(y)],4);
             break;
-        case 5:left();front();break;
+        case 5:
+            if(status = 0){
+                left();front();
+            } 
+            else if(status = 1){
+                checkleftbox1(x,y);   
+            }
+            // left();
+            break;
         case 6:front();break;
         default:left();left();front();break;
     }
 }
 void min2way(int a, int b,int checkw)
 {
-    int check1=0;
 	if (a <= b)
 	{
 		switch (checkw)
 		{
 		case 1:
-            // if(status = 0){
-            //     left();
-            // } 
-            // else if(status = 1){
-            //     check1 = checkleft(x,y);
-            //     switch(check1){
-            //         case 1:left();break;
-            //         case 2:right();right();right();break;
-            //         default:break;
-            //     }    
-            // }    
-            left();       
-            front();break; //left,right				
+            if(status = 0){
+                left();front();
+            } 
+            else if(status = 1){
+                checkleftbox1(x,y); 
+            }    
+            // left();       
+            break; //left,right				
 		case 2: front();break; //front,right
 		default: front();break;//front,left
 		}		
@@ -476,22 +456,33 @@ void min2way(int a, int b,int checkw)
 	{
 		switch (checkw)
 		{
-		case 1:	right();front();break; //left,right
-		case 2: right();front();break; //front,right
+		case 1:	
+            if(status = 0){
+                right();front();
+            } 
+            else if(status = 1){
+                checkrightbox1(x,y);   
+            }
+            // right();
+            break; //left,right
+		case 2: 
+            if(status = 0){
+                right();front();
+            } 
+            else if(status = 1){
+                checkrightbox1(x,y);   
+            }
+            // right();
+            break; //front,right
 		default: 
-            // if(status = 0){
-            //     left();
-            // } 
-            // else if(status = 1){
-            //     check1 = checkleft(x,y);
-            //     switch(check1){
-            //         case 1:left();break;
-            //         case 2:right();right();right();break;
-            //         default:break;
-            //     }    
-            // }
-            left();
-            front();break; //front,left			
+            if(status = 0){
+                left();front();
+            } 
+            else if(status = 1){
+                checkleftbox1(x,y);   
+            }
+            // left();
+            break; //front,left			
 		}		
 	}
 }
@@ -506,23 +497,25 @@ void min3way(int a, int b, int c)
 		}
 		else if (b < a && b < c)
 		{ //go left
-			// if(status = 0){
-            //     left();
-            // } 
-            // else if(status = 1){
-            //     check1 = checkleft(x,y);
-            //     switch(check1){
-            //         case 1:left();break;
-            //         case 2:right();right();right();break;
-            //         default:break;
-            //     }    
-            // }
-            left(); 
-            front();
+			if(status = 0){
+                left();front();
+            } 
+            else if(status = 1){
+                checkleftbox1(x,y);  
+            }
+            // left(); 
+            
 		}
 		else
 		{ //go right
-			right();front();
+			if(status = 0){
+                right();front();
+            } 
+            else if(status = 1){
+                checkrightbox1(x,y);   
+            }
+            // right();
+            
 		}
 	}
 	else
@@ -531,6 +524,7 @@ void min3way(int a, int b, int c)
 	}
 }
 
+////////////////////////////// north east west
 //front
 int checkxf(int x){
     switch(di){
@@ -582,7 +576,94 @@ int checkyr(int y){
         default: return y-1;
     }
 }
+//back
+int checkxb(int x){
+    switch(di){
+        case 0: return x+1;
+        case 1: return x;
+        case 2: return x;
+        default: return x-1;
+    }
+}
+int checkyb(int y){
+    switch(di){
+        case 0: return y;
+        case 1: return y+1;
+        case 2: return y-1;
+        default: return y;
+    }
+}
+////////////////////////////// ne nw be bw
+//northeast
+int checkxne(int x){
+    switch(di){
+        case 0: return x-1;
+        case 1: return x+1;
+        case 2: return x-1;
+        default: return x+1;
+    }
+}
+int checkyne(int y){
+    switch(di){
+        case 0: return y-1;
+        case 1: return y-1;
+        case 2: return y+1;
+        default: return y+1;
+    }
+}
+//northwest
+int checkxnw(int x){
+    switch(di){
+        case 0: return x-1;
+        case 1: return x-1;
+        case 2: return x+1;
+        default: return x+1;
+    }
+}
+int checkynw(int y){
+    switch(di){
+        case 0: return y+1;
+        case 1: return y-1;
+        case 2: return y+1;
+        default: return y-1;
+    }
+}
 
+//southeast
+int checkxse(int x){
+    switch(di){
+        case 0: return x+1;
+        case 1: return x+1;
+        case 2: return x-1;
+        default: return x-1;
+    }
+}
+int checkyse(int y){
+    switch(di){
+        case 0: return y-1;
+        case 1: return y+1;
+        case 2: return y-1;
+        default: return y+1;
+    }
+}
+//southwest
+int checkxsw(int x){
+    switch(di){
+        case 0: return x+1;
+        case 1: return x-1;
+        case 2: return x+1;
+        default: return x-1;
+    }
+}
+int checkysw(int y){
+    switch(di){
+        case 0: return y+1;
+        case 1: return y+1;
+        case 2: return y-1;
+        default: return y-1;
+    }
+}
+//turn car to box
 void prekeep(int bx ,int by){
     if(checkxf(x) == bx && checkyf(y) == by){
     }else if(checkxl(x) == bx && checkyl(y) == by){
@@ -594,115 +675,106 @@ void prekeep(int bx ,int by){
         left();
     }
 }
+//turn with box1
+void checkleftbox1(int x, int y){
+    //printf("left\n");
+    if(checkoor(checkxr(x),checkyr(y)) && checkoor(checkxsw(x),checkysw(y))){
+        left();
+    }
+    else{
+        if(checkoor(checkxsw(x),checkysw(y))){ //sw oor
+            if(mapone[checkxr(x)][checkyr(y)] != 99){
+                left();
+            }
+        }else {
+            if(mapone[checkxr(x)][checkyr(y)] != 99 && mapone[checkxsw(x)][checkysw(y)] != 99){
+                left();
+            }else if(mapone[checkxr(x)][checkyr(y)] != 99 &&  mapone[checkxnw(x)][checkynw(y)] != 99 &&
+                        mapone[checkxf(x)][checkyf(y)] != 99 && mapone[checkxne(x)][checkyne(y)] != 99 &&
+                        mapone[checkxl(x)][checkyl(y)] != 99 && mapone[checkxse(x)][checkyse(y)] != 99 ){
+                right();right();right();
+            }
+            /*else if((mapone[checkxne(x)][checkyne(y)] == 99 && mapone[checkxnw(x)][checkynw(y)] == 99 &&
+                        mapone[checkxse(x)][checkyse(y)] == 99 && mapone[checkxsw(x)][checkysw(y)] == 99 ) &&
+                        mapone[checkxf(x)][checkyf(y)] == 99 || mapone[checkxl(x)][checkyl(y)] == 99 || mapone[checkxr(x)][checkyr(y)] == 99){
+                printf("Release box");
+                status=0;
+                left();left();
+                front();front();
+                printf("Keep box");
+                status=1;
+                left();
+            }*/
+            else{
+                front();
+            }
+            
+        }
+    }    
+}
 
-/*
-void clearmap(){
-    for(int i=0;i<10;i++){
-        for(int j=0;j<10;j++){
-            map[i][j]=mapone[i][j];
+void checkrightbox1(int x, int y){
+    //printf("right\n");
+    if(checkoor(checkxl(x),checkyl(y)) && checkoor(checkxse(x),checkyse(y))){
+        right();
+    }
+    else{
+        if(checkoor(checkxse(x),checkyse(y))){ //sw oor
+            if(mapone[checkxl(x)][checkyl(y)] != 99){
+                right();
+            }
+        }else{
+            if(mapone[checkxl(x)][checkyl(y)] != 99 && mapone[checkxse(x)][checkyse(y)] != 99){
+                
+                right();
+            }else if(mapone[checkxl(x)][checkyl(y)] != 99 &&  mapone[checkxnw(x)][checkynw(y)] != 99 &&
+                        mapone[checkxf(x)][checkyf(y)] != 99 && mapone[checkxne(x)][checkyne(y)] != 99 &&
+                        mapone[checkxr(x)][checkyr(y)] != 99 && mapone[checkxsw(x)][checkysw(y)] != 99 ){
+                left();left();left();
+
+            }
+            /*else if((mapone[checkxne(x)][checkyne(y)] == 99 && mapone[checkxnw(x)][checkynw(y)] == 99 &&
+                        mapone[checkxse(x)][checkyse(y)] == 99 && mapone[checkxsw(x)][checkysw(y)] == 99 ) &&
+                        mapone[checkxf(x)][checkyf(y)] == 99 || mapone[checkxl(x)][checkyl(y)] == 99 || mapone[checkxr(x)][checkyr(y)] == 99){
+                printf("Release box");
+                status=0;
+                left();left();
+                front();front();
+                printf("Keep box");
+                status=1;
+                right();
+            }*/
+            else{
+                //printf("*\n");
+                front();
+            }
+            
         }
     }
-}
-*/
-
-//////////////////////////////move to goal with box1
-void movewbox1(){
-    int checkw=0,check1=0;
-    if (mapone[x-1][y] == 99 || checkoor(x-1,y)) checkw += 1; //#front
-    if (mapone[x][y-1] == 99 || checkoor(x,y-1)) checkw += 2; //#left
-    if (mapone[x][y+1] == 99 || checkoor(x,y+1)) checkw += 4; //#right
-    switch(checkw){
-        case 0:
-            switch(di){
-                case 0:min3way(mapone[x - 1][y], mapone[x][y - 1], mapone[x][y + 1]);break;
-                case 1:min3way(mapone[x][y - 1], mapone[x + 1][y], mapone[x - 1][y]);break;
-                case 2:min3way(mapone[x][y + 1], mapone[x - 1][y], mapone[x + 1][y]);break;
-                default:min3way(mapone[x + 1][y], mapone[x][y + 1], mapone[x][y - 1]);break;                
-            }break;
-        case 1:switch(di){
-                case 0:min2way(mapone[x][y - 1], mapone[x][y + 1],1);break;
-                case 1:min2way(mapone[x + 1][y], mapone[x - 1][y],1);break;
-                case 2:min2way(mapone[x - 1][y], mapone[x + 1][y],1);break;
-                default:min2way(mapone[x][y + 1], mapone[x][y - 1],1);break;                
-            }break;
-        case 2:switch(di){
-                case 0:min2way(mapone[x - 1][y], mapone[x][y + 1],2);break;
-                case 1:min2way(mapone[x][y - 1], mapone[x - 1][y],2);break;
-                case 2:min2way(mapone[x][y + 1], mapone[x + 1][y],2);break;
-                default:min2way(mapone[x + 1][y], mapone[x][y - 1],2);break;                
-            }break;
-        case 3:        
-            right();front();break;
-        case 4:switch(di){
-                case 0:min2way(mapone[x - 1][y], mapone[x][y - 1],4);break;
-                case 1:min2way(mapone[x][y - 1], mapone[x + 1][y],4);break;
-                case 2:min2way(mapone[x][y + 1], mapone[x - 1][y],4);break;
-                default:min2way(mapone[x + 1][y], mapone[x][y + 1],4);break;                
-            }break;
-        case 5:
-            check1 = checkleft(x,y);
-            switch(check1){
-                case 1:left();break;
-                case 2:right();right();right();break;
-                default:break;
-            }            
-            front();break;
-        case 6:front();break;
-        default: 
-            left();left();front();break;
-    }
-}
-int checkleft(int x, int y){
-    switch(di){
-        case 0:
-            if(mapone[x][y+1] == 1 && mapone[x+1][y+1] == 1){
-                return 1;
-            }else if(mapone[x][y+1] == 1 && mapone[x-1][y+1] == 1 &&                     
-                    mapone[x-1][y] == 1 && mapone[x-1][y-1] == 1 &&
-                    mapone[x][y-1] == 1 && mapone[x+1][y-1] == 1){
-                return 2;
-            }else{
-                return 3;
-            }
-            break;
-        case 1:
-            if(mapone[x-1][y] == 1 && mapone[x-1][y+1] == 1){
-                return 1;
-            }else if(mapone[x-1][y] == 1 && mapone[x-1][y-1] == 1 &&                     
-                    mapone[x][y-1] == 1 && mapone[x+1][y-1] == 1 &&
-                    mapone[x+1][y] == 1 && mapone[x+1][y+1] == 1){
-                return 2;
-            }else{
-                return 3;
-            }
-            break;
-        case 2:
-            if(mapone[x+1][y] == 1 && mapone[x+1][y-1] == 1){
-                return 1;
-            }else if(mapone[x+1][y] == 1 && mapone[x+1][y+1] == 1 &&                     
-                    mapone[x][y+1] == 1 && mapone[x-1][y+1] == 1 &&
-                    mapone[x-1][y] == 1 && mapone[x-1][y-1] == 1){
-                return 2;
-            }else{
-                return 3;
-            }
-            break;
-        default:
-            if(mapone[x-1][y-1] == 1 && mapone[x][y-1] == 1){
-                return 1;
-            }else if(mapone[x][y-1] == 1 && mapone[x+1][y-1] == 1 &&                     
-                    mapone[x+1][y] == 1 && mapone[x+1][y+1] == 1 &&
-                    mapone[x][y+1] == 1 && mapone[x-1][y+1] == 1){
-                return 2;
-            }else{
-                return 3;
-            }
-            break;
-
-    }
     
-
 }
-void checkmap(int x,int y,int a){
 
+int checkplace(int bx,int by){
+    int checkw=0;
+    if(mapone[checkxf(bx)][checkyf(by)] == 99){
+        checkw+=1;
+    }else if(mapone[checkxl(bx)][checkyl(by)] == 99){
+        checkw+=2;
+    }
+    else if(mapone[checkxr(bx)][checkyr(by)] == 99){
+        checkw+=4;
+    }
+    else if(mapone[checkxb(bx)][checkyb(by)] == 99){
+        checkw+=8;
+    }
+    return checkw;
 }
+// void preplace11(){
+//     int checkw=0;
+//     checkw = checkplace(bx,by);
+//     switch(checkw){
+//         case 0:break;
+//     }
+
+    
+// }
