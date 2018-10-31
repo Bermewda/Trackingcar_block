@@ -4,6 +4,7 @@ int x=9,y=9;
 int di=0; //0 front ,1 left ,2 right,3 back
 int ultra = 0;
 int bx=0,by=0;
+int bx1=0,by1=0,bx2=0,by2=0;
 int status = 0;
 
 void front(){
@@ -13,6 +14,7 @@ void front(){
         case 2:y++;break;
         default:x++;break;
     }
+    printf("front ");
 }
 void left(){
     switch(di){
@@ -21,6 +23,7 @@ void left(){
         case 2:di=0;break;
         default:di=2;break;
     }
+    printf("left ");
 }
 void right(){
     switch(di){
@@ -29,6 +32,7 @@ void right(){
         case 2:di=3;break;
         default:di=1;break;
     }
+    printf("right ");
 }
 void back(){
     switch(di){
@@ -56,15 +60,15 @@ int mapone[10][10] =  //changemap at
 int map[10][10] = 
 {   //0 1 2 3 4 5 6 7 8 9
     {1,1,1,1,1, 1,1,1,1,1},//0
-    {1,1,9,1,1, 1,1,1,9,1},//1
-    {1,1,1,1,1, 1,1,1,1,1},//2
-    {1,1,6,1,1, 1,1,1,1,1},//3
-    {1,1,6,1,1, 1,1,1,1,1},//4
+    {1,1,1,1,1, 1,1,1,1,1},//1
+    {1,1,9,1,1, 1,1,1,1,1},//2
+    {1,1,1,1,1, 1,1,1,1,1},//3
+    {1,1,1,6,6, 1,1,9,1,1},//4
     
-    {1,1,1,1,1, 1,1,1,1,1},//5
-    {1,1,1,1,1, 9,1,1,1,1},//6
+    {1,1,1,1,1, 9,1,1,1,1},//5
+    {1,1,1,6,1, 1,1,6,1,1},//6
     {1,1,1,9,1, 1,1,1,1,1},//7
-    {1,1,1,6,1, 6,1,1,1,1},//8
+    {1,1,1,1,1, 6,1,1,1,1},//8
     {1,1,1,1,1, 1,1,1,1,1} //9
 };
 
@@ -96,6 +100,7 @@ void printmap(int map[][10]);
 void printxy(int x,int y);
 
 void findone();
+void findtwo();
 void findwall(int bx,int by);
 
 int checkoor(int x,int y);
@@ -109,6 +114,7 @@ void move();
 void min2way(int a, int b,int checkw);
 void min3way(int a, int b, int c);
 void prekeep(int bx ,int by);
+void keep();
 
 void checkleftbox1(int x, int y);
 void checkrightbox1(int x, int y);
@@ -120,6 +126,9 @@ void preplace1();
 
 void findboxsmall();
 void findgoalboxsmall();
+
+void findboxbig();
+void findgoalboxbig();
 //****block (1,7) (7,2) (5,6)(6,6)****//
 
 int main(){
@@ -133,6 +142,8 @@ int main(){
     //find goal
     findgoalboxsmall();
 
+    printmap(map);
+
     //find boxmall 1 : Round 2
     findboxsmall();
 
@@ -143,7 +154,9 @@ int main(){
     findgoalboxsmall();
 
     printmap(map);
-    
+
+    //find boxbig 
+    findboxbig();
 
     return 0;
 }
@@ -169,12 +182,14 @@ void findboxsmall(){
         
     }
     prekeep(bx,by);
-    printf("keep block\n\n");
+    keep();
+    printxy(x,y);
+    
+    printf("\nkeep block\n\n");
     status = 1;
 }
 void findgoalboxsmall(){
     
-
     printxy(x,y);
     printxy(bx,by);
     for(int i=0;i<15;i++){
@@ -196,10 +211,24 @@ void findgoalboxsmall(){
     } 
     preplace1();
     printxy(x,y);
-    printf("place box\n\n");
+    printf("\nplace box\n\n");
     status = 0;
     map[bx][by]=9;
 }
+
+void findboxbig(){
+    findtwo();
+    map[bx1][by1]=1;
+    //map[bx2][by2]=1;
+    printxy(x,y);
+    printxy(bx1,by1);
+    printxy(bx2,by2);
+    for(int i=0;i<15;i++){
+        changeone(bx1,by1);
+    }     
+    printmap(mapone);
+}
+void findgoalboxbig();
 ////////////////////////////// print
 void printmap(int map[][10]){
     printf("\n 0  1  2  3  4  5  6  7  8  9 \n\n");
@@ -214,7 +243,7 @@ void printmap(int map[][10]){
 }
 
 void printxy(int x,int y){
-    printf("%d : (%d,%d)\n",di,x,y);
+    printf("\n%d : (%d,%d)",di,x,y);
 }
 
 ////////////////////////////// find box one
@@ -247,7 +276,33 @@ void findwall(int bx,int by){
     //wall[bx][by]=0;
     mapone[bx][by]=0;
 }
-
+void findtwo(){
+    int count =0;
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(map[i][j]==6){
+                //if(map[i+1][j] != 6 && map[i][j+1] != 6 && map[i-1][j] != 6 && map[i][j-1] != 6){
+                    if(count==0){
+                        bx1 = i;
+                        by1 = j;
+                        mapone[i][j]=0; 
+                        count++;
+                    }else if(count==1){
+                        bx2 = i;
+                        by2 = j;
+                        mapone[i][j]=0; 
+                        count++;
+                    }else{
+                        break;
+                    }
+                    
+                //}                    
+            }
+            
+        }
+    }
+    findwall(bx,by);
+}
 ////////////////////////////// change map
 int checkoor(int x,int y){
     if(x < 0 || x > 9 || y < 0 || y > 9){
@@ -418,29 +473,29 @@ int min4(int a, int b, int c, int d)
 void move(){
     int checkw=0;
     if(checkoor(checkxf(x),checkyf(y))){
-        //printf("fwall\n");
+        printf("fwall ");
         checkw += 1; //front
     }else{
         if (mapone[checkxf(x)][checkyf(y)] == 99 ){
-           // printf("fwall\n");
+            printf("fwall ");
            checkw += 1; //front 
         }
     }
     if(checkoor(checkxl(x),checkyl(y))){
-        //printf("lwall\n");
+        printf("lwall ");
         checkw += 2; //left
     }else{
         if (mapone[checkxl(x)][checkyl(y)] == 99){
-            //printf("lwall\n");
+            printf("lwall ");
             checkw += 2; //left
         }
     }
     if(checkoor(checkxr(x),checkyr(y))){
-        //printf("rwall\n");
+        printf("rwall ");
         checkw += 4; //right
     }else{
         if (mapone[checkxr(x)][checkyr(y)] == 99){
-            //printf("rwall\n");
+            printf("rwall ");
             checkw += 4; //right
         }
     }    
@@ -452,10 +507,10 @@ void move(){
         case 2: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxr(x)][checkyr(y)],2);
             break;
         case 3:
-            if(status = 0){
+            if(status == 0){
                 right();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkrightbox1(x,y);   
             }
             // right();
@@ -463,10 +518,10 @@ void move(){
         case 4: min2way(mapone[checkxf(x)][checkyf(y)] , mapone[checkxl(x)][checkyl(y)],4);
             break;
         case 5:
-            if(status = 0){
+            if(status == 0){
                 left();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkleftbox1(x,y);   
             }
             // left();
@@ -482,10 +537,10 @@ void min2way(int a, int b,int checkw)
 		switch (checkw)
 		{
 		case 1:
-            if(status = 0){
+            if(status == 0){
                 left();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkleftbox1(x,y); 
             }    
             // left();       
@@ -499,28 +554,28 @@ void min2way(int a, int b,int checkw)
 		switch (checkw)
 		{
 		case 1:	
-            if(status = 0){
+            if(status == 0){
                 right();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkrightbox1(x,y);   
             }
             // right();
             break; //left,right
 		case 2: 
-            if(status = 0){
+            if(status == 0){
                 right();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkrightbox1(x,y);   
             }
             // right();
             break; //front,right
 		default: 
-            if(status = 0){
+            if(status == 0){
                 left();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkleftbox1(x,y);   
             }
             // left();
@@ -539,10 +594,10 @@ void min3way(int a, int b, int c)
 		}
 		else if (b < a && b < c)
 		{ //go left
-			if(status = 0){
+			if(status == 0){
                 left();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkleftbox1(x,y);  
             }
             // left(); 
@@ -550,20 +605,55 @@ void min3way(int a, int b, int c)
 		}
 		else
 		{ //go right
-			if(status = 0){
+			if(status == 0){
                 right();front();
             } 
-            else if(status = 1){
+            else if(status == 1){
                 checkrightbox1(x,y);   
             }
             // right();
             
 		}
 	}
-	else
+	else if(a == b)
 	{
-		front();
+        if(a < c){
+           front(); 
+        }else{
+            if(status == 0){
+                right();front();
+            } 
+            else if(status == 1){
+                checkrightbox1(x,y);   
+            }
+        }		
 	}
+    else if(a == c)
+	{
+        if(a < b){
+           front(); 
+        }else{
+            if(status == 0){
+                left();front();
+            } 
+            else if(status == 1){
+                checkleftbox1(x,y);  
+            }
+        }		
+	}else if(b == c){
+        if(a < b){
+           front(); 
+        }else{
+            if(status == 0){
+                left();front();
+            } 
+            else if(status == 1){
+                checkleftbox1(x,y);  
+            }
+        }
+    }else{
+        front();
+    }
 }
 
 ////////////////////////////// north east west
@@ -716,6 +806,9 @@ void prekeep(int bx ,int by){
         left();
         left();
     }
+}
+void keep(){
+    left();left();
 }
 //turn with box1
 void checkleftbox1(int x, int y){
@@ -884,25 +977,25 @@ int checkwallgoal(){
 int checkdiplace(){
     if(!checkoor(checkxf(x),checkyf(y))){
         if(mapone[checkxf(x)][checkyf(y)] == mapone[bx][by]){
-            //printf("front");
+            //printf("\nfront*");
             return 0;
         }
     }
     if(!checkoor(checkxl(x),checkyl(y))){
         if(mapone[checkxl(x)][checkyl(y)] == mapone[bx][by]){
-            //printf("left");
+            //printf("\nleft*");
             return 1;
         }
     }
     if(!checkoor(checkxr(x),checkyr(y))){
         if(mapone[checkxr(x)][checkyr(y)] == mapone[bx][by]){
-            //printf("right");
+            //printf("\nright*");
             return 2;
         }
     }
     if(!checkoor(checkxb(x),checkyb(y))){
         if(mapone[checkxb(x)][checkyb(y)] == mapone[bx][by]){
-            //printf("back");
+            //printf("\nback*");
             return 3;
         }
     }
@@ -914,7 +1007,12 @@ void preplace1(){
     checkp = checkdiplace();
     switch(checkp){
         case 0:
-            checkbackbox1(x,y);             
+            if(checkw == 6 || checkw == 9){
+                front();
+                front();
+            }else{
+               checkbackbox1(x,y);   
+            }                       
             break;
         case 1:
             checkrightbox1(x,y);            
