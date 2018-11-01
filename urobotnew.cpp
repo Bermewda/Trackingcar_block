@@ -62,18 +62,17 @@ int mapone[10][10] =  //changemap at
 int map[10][10] =
 {   //0 1 2 3 4 5 6 7 8 9
 	{1,1,1,1,1, 1,1,1,1,1},//0
-	{1,9,1,1,1, 1,1,1,1,1},//1
-	{1,1,1,1,1, 1,1,9,1,1},//2
-	{1,1,1,6,6, 1,1,6,1,1},//3
+	{1,1,1,1,1, 6,9,1,1,1},//1
+	{1,1,6,1,1, 1,1,1,1,1},//2
+	{1,1,1,1,9, 1,1,1,1,1},//3
 	{1,1,1,1,1, 1,1,1,1,1},//4
 
-	{1,1,1,6,1, 9,1,1,1,1},//5
-	{1,1,1,9,1, 1,1,1,1,1},//6
-	{1,1,1,1,1, 1,1,1,1,1},//7
+	{1,1,1,1,1, 1,1,9,1,1},//5
+	{1,1,9,1,1, 6,1,1,1,1},//6
+	{1,1,1,1,1, 6,1,1,1,1},//7
 	{1,1,1,1,1, 1,1,1,1,1},//8
 	{1,1,1,1,1, 1,1,1,1,1} //9
 };
-
 /*
 void checkblock(int x,int y);
 
@@ -168,6 +167,8 @@ int main(){
     by1=6;
     bx2=6;
     by2=6;
+    
+    findgoalboxbig();
 
     return 0;
 }
@@ -227,6 +228,7 @@ void findgoalboxsmall(){
 }
 
 void findboxbig(){
+
     findtwo();
     printxy(x,y);
     printxy(bx1,by1);
@@ -234,6 +236,7 @@ void findboxbig(){
     findwall2(bx1,by1,bx2,by2);   
     map[bx1][by1]=1;
     map[bx2][by2]=1;
+    printmap(mapone);
     if(bx1 == bx2){//hori  
         mapone[bx1-1][by1]=99;
         mapone[bx2-1][by2]=99;
@@ -250,7 +253,7 @@ void findboxbig(){
     for(int i=0;i<15;i++){
         changetwo(bx1,by1,bx2,by2);        
     }     
-    printmap(mapone);
+    
     while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
         if(mapone[x][y]==1){
             break; //keepblock
@@ -282,22 +285,85 @@ void findboxbig(){
         }
     }else{//vert 
         if (map[bx1][by1-1] !=9){
-            mapone[bx1][by1-1]=99;
+            mapone[bx1][by1-1]=1;
         }
         if(map[bx2][by2-1] !=9){
-            mapone[bx2][by2-1]=99;
+            mapone[bx2][by2-1]=1;
         }
         if(map[bx1][by1+1] !=9){
-            mapone[bx1][by1+1]=99;
+            mapone[bx1][by1+1]=1;
         }
         if(map[bx2][by2+1] !=9){
-            mapone[bx2][by2+1]=99;
+            mapone[bx2][by2+1]=1;
         }
     }
-    printmap(mapone);
 
 }
-void findgoalboxbig();
+void findgoalboxbig(){
+
+    printxy(x,y);
+    printxy(bx1,by1);
+    printxy(bx2,by2);
+    printmap(mapone); 
+    /*  
+    if(bx1 == bx2){//hori 
+        if(mapone[checkxf(bx1)][checkyf(by1)] != 99 && mapone[checkxf(bx2)][checkyf(by2)] != 99 ){
+            mapone[bx1-1][by1]+=1;
+            mapone[bx2-1][by2]+=1;
+            mapone[bx1+1][by1]+=1;
+            mapone[bx2+1][by2]+=1; 
+        }
+        
+    }else{//vert 
+        if(mapone[checkxr(bx1)][checkyr(by1)] != 99 && mapone[checkxl(bx2)][checkyl(by2)] != 99 ){
+            mapone[bx1][by1-1]+=1;
+            mapone[bx2][by2-1]+=1;
+            mapone[bx1][by1+1]+=1;
+            mapone[bx2][by2+1]+=1;
+        }
+    }
+    //*/ 
+    for(int i=0;i<15;i++){
+        changetwo(bx1,by1,bx2,by2); 
+    }
+    
+    /*
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(map[i][j] == 9){
+                mapone[checkxf(i)][checkyf(j)]+=1;
+                mapone[checkxr(i)][checkyr(j)]+=1;
+                mapone[checkxl(i)][checkyl(j)]+=1;
+                mapone[checkxb(i)][checkyb(j)]+=1;
+
+                mapone[checkxse(i)][checkyse(j)]+=1;
+                mapone[checkxsw(i)][checkysw(j)]+=1;
+                mapone[checkxne(i)][checkyne(j)]+=1;
+                mapone[checkxnw(i)][checkynw(j)]+=1;
+            }
+        }
+    }
+    mapone[bx1][by1]=0;
+    mapone[bx2][by2]=0; 
+    //*/ 
+    printmap(mapone);   
+    
+    while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
+        if(mapone[x][y]==1){
+            break; //keepblock
+        }else{
+            move();
+            printxy(x,y);
+        }  
+    }
+    preplace1();
+    printxy(x,y);
+    printf("\nplace box\n\n");
+    status = 0;
+    mapone[bx1][by1]=9;
+    mapone[bx2][by2]=9; 
+
+}
 ////////////////////////////// print
 void printmap(int map[][10]){
     printf("\n 0  1  2  3  4  5  6  7  8  9 \n\n");
@@ -399,10 +465,6 @@ void findwall2(int bx1,int by1,int bx2,int by2){
     //     box2=2;
     // }
     // printf("%d\n",box2);
-}
-void fbox(int bx,int by){
-    
-
 }
 ////////////////////////////// change map
 int checkoor(int x,int y){
