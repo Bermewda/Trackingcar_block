@@ -63,12 +63,12 @@ int map[10][10] =
 {   //0 1 2 3 4 5 6 7 8 9
 	{1,1,1,1,1, 1,1,1,1,1},//0
 	{1,1,1,1,1, 6,9,1,1,1},//1
-	{1,1,6,1,1, 1,1,1,1,1},//2
-	{1,1,1,1,9, 1,1,1,1,1},//3
+	{1,1,6,9,1, 1,1,1,1,1},//2
+	{1,1,1,1,1, 1,1,1,1,1},//3
 	{1,1,1,1,1, 1,1,1,1,1},//4
 
-	{1,1,1,1,1, 1,1,9,1,1},//5
-	{1,1,9,1,1, 6,1,1,1,1},//6
+	{1,1,1,1,1, 1,1,1,1,1},//5
+	{1,1,9,1,1, 6,1,9,1,1},//6
 	{1,1,1,1,1, 6,1,1,1,1},//7
 	{1,1,1,1,1, 1,1,1,1,1},//8
 	{1,1,1,1,1, 1,1,1,1,1} //9
@@ -104,6 +104,9 @@ void findone();
 void findtwo();
 void findwall(int bx,int by);
 void findwall2(int bx1,int by1,int bx2,int by2);
+void change2();
+void checkprekeep();
+int checkmap2box();
 
 int checkoor(int x,int y);
 int checkwall(int x,int y);
@@ -123,9 +126,9 @@ void checkleftbox1(int x, int y);
 void checkrightbox1(int x, int y);
 void checkbackbox1(int x,int y);
 
-int checkwallgoal(); //check wall around place
-int checkdiplace(); //check position between car and place
-void preplace1();
+int checkwallgoal(int bx,int by); //check wall around place
+int checkdiplace(int bx,int by); //check position between car and place
+void preplace1(int bx,int by);
 
 void findboxsmall();
 void findgoalboxsmall();
@@ -169,6 +172,8 @@ int main(){
     by2=6;
     
     findgoalboxbig();
+
+    printmap(map); 
 
     return 0;
 }
@@ -220,7 +225,7 @@ void findgoalboxsmall(){
         }  
        // count++;
     } 
-    preplace1();
+    preplace1(bx,by);
     printxy(x,y);
     printf("\nplace box\n\n");
     status = 0;
@@ -236,7 +241,6 @@ void findboxbig(){
     findwall2(bx1,by1,bx2,by2);   
     map[bx1][by1]=1;
     map[bx2][by2]=1;
-    printmap(mapone);
     if(bx1 == bx2){//hori  
         mapone[bx1-1][by1]=99;
         mapone[bx2-1][by2]=99;
@@ -248,12 +252,13 @@ void findboxbig(){
         mapone[bx2][by2-1]=99;
         mapone[bx1][by1+1]=99;
         mapone[bx2][by2+1]=99; 
-        box2=2;
+        box2=2;        
     }
     for(int i=0;i<15;i++){
         changetwo(bx1,by1,bx2,by2);        
-    }     
+    }    
     
+    printmap(mapone);
     while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
         if(mapone[x][y]==1){
             break; //keepblock
@@ -262,12 +267,10 @@ void findboxbig(){
             printxy(x,y);
         }        
         
-    }
-    prekeep(bx1,by1);
-    prekeep(bx2,by2);
+    }    
+    checkprekeep();
     keep();
-    printxy(x,y);
-    
+    printxy(x,y);    
     printf("\nkeep block\n\n");
     status = 1;
     if(bx1 == bx2){//hori
@@ -301,68 +304,83 @@ void findboxbig(){
 }
 void findgoalboxbig(){
 
+    int count =0;
     printxy(x,y);
     printxy(bx1,by1);
     printxy(bx2,by2);
-    printmap(mapone); 
-    /*  
-    if(bx1 == bx2){//hori 
-        if(mapone[checkxf(bx1)][checkyf(by1)] != 99 && mapone[checkxf(bx2)][checkyf(by2)] != 99 ){
-            mapone[bx1-1][by1]+=1;
-            mapone[bx2-1][by2]+=1;
-            mapone[bx1+1][by1]+=1;
-            mapone[bx2+1][by2]+=1; 
-        }
-        
-    }else{//vert 
-        if(mapone[checkxr(bx1)][checkyr(by1)] != 99 && mapone[checkxl(bx2)][checkyl(by2)] != 99 ){
-            mapone[bx1][by1-1]+=1;
-            mapone[bx2][by2-1]+=1;
-            mapone[bx1][by1+1]+=1;
-            mapone[bx2][by2+1]+=1;
-        }
+    int two=0;
+    two = checkmap2box(); 
+    change2();
+    if(mapone[5][5]!=99){
+        mapone[5][5]=99;
     }
-    //*/ 
-    for(int i=0;i<15;i++){
-        changetwo(bx1,by1,bx2,by2); 
+    if(mapone[6][5]!=99){
+        mapone[6][5]=99;
     }
-    
-    /*
-    for(int i=0;i<10;i++){
-        for(int j=0;j<10;j++){
-            if(map[i][j] == 9){
-                mapone[checkxf(i)][checkyf(j)]+=1;
-                mapone[checkxr(i)][checkyr(j)]+=1;
-                mapone[checkxl(i)][checkyl(j)]+=1;
-                mapone[checkxb(i)][checkyb(j)]+=1;
+    if(mapone[5][7]!=99){
+        mapone[5][7]=99;
+    }
+    if(mapone[6][7]!=99){
+        mapone[6][7]=99;
+    }
+    if(two>1){
+       for(int i=0;i<15;i++){
+            changeone(bx,by);
+        } 
+        while(x!=bx || y!=by ){
+        //while(count != 10){
+            
+                move();
+                printxy(x,y);
+            
+            //count++;
+        }
 
-                mapone[checkxse(i)][checkyse(j)]+=1;
-                mapone[checkxsw(i)][checkysw(j)]+=1;
-                mapone[checkxne(i)][checkyne(j)]+=1;
-                mapone[checkxnw(i)][checkynw(j)]+=1;
-            }
+    }else{
+        for(int i=0;i<15;i++){
+            changetwo(bx1,by1,bx2,by2); 
+        }
+        while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
+    //while(count != 10){
+            if(mapone[x][y]==1){
+                break; //keepblock
+            }else{
+                move();
+                printxy(x,y);
+            }  
+            //count++;
         }
     }
-    mapone[bx1][by1]=0;
-    mapone[bx2][by2]=0; 
-    //*/ 
-    printmap(mapone);   
-    
-    while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
-        if(mapone[x][y]==1){
-            break; //keepblock
-        }else{
-            move();
-            printxy(x,y);
-        }  
+    printmap(mapone); 
+    if(map[5][5]!=9){
+        mapone[5][5]=1;
     }
-    preplace1();
+    if(map[6][5]!=9){
+        mapone[6][5]=1;
+    }
+    if(map[5][7]!=9){
+        mapone[5][7]=1;
+    }
+    if(map[6][7]!=9){
+        mapone[6][7]=1;
+    }
+    printmap(mapone); 
+    for(int i=0;i<15;i++){
+            changetwo(bx1,by1,bx2,by2); 
+    }
+    printmap(mapone); 
+
+    if(x==4){
+        preplace1(bx1,by1);
+    }
+    if(x=7){
+        preplace1(bx2,by2);
+    }    
     printxy(x,y);
     printf("\nplace box\n\n");
     status = 0;
-    mapone[bx1][by1]=9;
-    mapone[bx2][by2]=9; 
-
+    map[bx1][by1]=9;
+    map[bx2][by2]=9; 
 }
 ////////////////////////////// print
 void printmap(int map[][10]){
@@ -465,6 +483,85 @@ void findwall2(int bx1,int by1,int bx2,int by2){
     //     box2=2;
     // }
     // printf("%d\n",box2);
+}
+void change2(){
+    ///*
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(map[i][j] == 9){
+                mapone[checkxf(i)][checkyf(j)]=99;
+                mapone[checkxr(i)][checkyr(j)]=99;
+                mapone[checkxl(i)][checkyl(j)]=99;
+                mapone[checkxb(i)][checkyb(j)]=99;
+
+                mapone[checkxse(i)][checkyse(j)]=99;
+                mapone[checkxsw(i)][checkysw(j)]=99;
+                mapone[checkxne(i)][checkyne(j)]=99;
+                mapone[checkxnw(i)][checkynw(j)]=99;
+            }
+        }
+    }
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(i==9 || j==9 || i==0 || j==0 ){
+                mapone[i][j]=1;
+            }
+        }
+    }
+    if(map[4][6]!=9){
+        mapone[4][6]=1;
+    }
+    if(map[7][6]!=9){
+        mapone[7][6]=1;
+    }
+
+    
+   
+    mapone[bx1][by1]=0;
+    mapone[bx2][by2]=0; 
+    //*/ 
+
+}
+void checkprekeep(){
+    if(box2==1){ //hori
+        if(mapone[x][y+1] == mapone[bx1][by1]){
+            prekeep(bx1,by1);
+        }else{
+            prekeep(bx2,by2);
+        }
+    }else{
+        if(mapone[x+1][y] == mapone[bx1][by1]){
+            
+            prekeep(bx1,by1);
+        }else{
+            prekeep(bx2,by2);
+        }
+    }
+    
+}
+//for 2 box
+int checkmap2box(){
+    int two=0;
+    by=6;
+    if(map[4][by]!=9 && map[7][by]!=9){
+        if(map[8][by]!=9){
+            bx=7;
+            two=2;
+        }else if(map[3][by]!=9 && map[2][by]!=9 && map[1][by]!=9){
+            bx=4;
+            two=2;
+        }else{
+            two=1;
+        }  
+        
+    }else if(map[4][by]==9){
+        bx=7;
+        two=3;
+    }else if(map[7][by]==9){
+        bx=4;
+        two=3;
+    }
+    return two;
 }
 ////////////////////////////// change map
 int checkoor(int x,int y){
@@ -1034,7 +1131,8 @@ void prekeep(int bx ,int by){
         left();
     }else if(checkxr(x) == bx && checkyr(y) == by){
         right();
-    }else{
+    }
+    else{
         left();
         left();
     }
@@ -1292,7 +1390,7 @@ void checkbackbox1(int x,int y){
     }
 }
 ////////////////////////////// place
-int checkwallgoal(){
+int checkwallgoal(int bx,int by){
     int checkw=0;
     if(mapone[checkxf(bx)][checkyf(by)] == 99){
         checkw+=1;
@@ -1308,7 +1406,7 @@ int checkwallgoal(){
     return checkw;
 }
 
-int checkdiplace(){
+int checkdiplace(int bx,int by){
     if(!checkoor(checkxf(x),checkyf(y))){
         if(mapone[checkxf(x)][checkyf(y)] == mapone[bx][by]){
             //printf("\nfront*");
@@ -1335,10 +1433,10 @@ int checkdiplace(){
     }
 }
 ///*
-void preplace1(){
+void preplace1(int bx,int by){
     int checkw=0,checkp=0;
-    checkw = checkwallgoal();
-    checkp = checkdiplace();
+    checkw = checkwallgoal(bx,by);
+    checkp = checkdiplace(bx,by);
     switch(checkp){
         case 0:
             printf(" goal in the front \n");
@@ -1356,6 +1454,9 @@ void preplace1(){
         case 2:
             printf(" goal in the right \n");
             checkleftbox1(x,y);
+            break;
+        default:
+            printf(" goal in the back \n");
             break;
     }
   
