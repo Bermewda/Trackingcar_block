@@ -63,13 +63,13 @@ int map[10][10] =
 {   //0 1 2 3 4 5 6 7 8 9
 	{1,1,1,1,1, 1,1,1,1,1},//0
 	{1,1,1,1,1, 6,9,1,1,1},//1
-	{1,1,6,9,1, 1,1,1,1,1},//2
-	{1,1,1,1,1, 1,1,1,1,1},//3
+	{1,1,1,1,1, 1,1,1,1,1},//2
+	{1,6,1,1,1, 1,1,1,1,1},//3
 	{1,1,1,1,1, 1,1,1,1,1},//4
 
-	{1,1,1,1,1, 1,1,1,1,1},//5
-	{1,1,9,1,1, 6,1,9,1,1},//6
-	{1,1,1,1,1, 6,1,1,1,1},//7
+	{1,1,1,6,6, 1,1,9,1,1},//5
+	{1,1,1,1,1, 1,1,1,1,1},//6
+	{1,9,1,1,1, 1,9,1,1,1},//7
 	{1,1,1,1,1, 1,1,1,1,1},//8
 	{1,1,1,1,1, 1,1,1,1,1} //9
 };
@@ -132,6 +132,7 @@ void preplace1(int bx,int by);
 
 void findboxsmall();
 void findgoalboxsmall();
+void findgoalboxsmallv1();
 
 void findboxbig();
 void findgoalboxbig();
@@ -140,6 +141,8 @@ void findgoalboxbig();
 int main(){
 
     //find boxmall 1 : Round 1
+    printf("------------------------------ Small Box1 ------------------------------\n");
+    
     findboxsmall();
 
     bx=7;
@@ -147,9 +150,9 @@ int main(){
 
     //find goal
     findgoalboxsmall();
-
+    
     //printmap(map);
-    printf("------------------------------ Small Box ------------------------------\n");
+    printf("------------------------------ Small Box2 ------------------------------\n");
     //find boxmall 1 : Round 2
     findboxsmall();
 
@@ -163,18 +166,28 @@ int main(){
 
     //find boxbig 
     printf("------------------------------ Big Box ------------------------------\n");
-
-    findboxbig();
-
-    bx1=5;
-    by1=6;
-    bx2=6;
-    by2=6;
     
-    findgoalboxbig();
+    findboxbig();
+    
+    // bx1=5;
+    // by1=6;
+    // bx2=6;
+    // by2=6;
+    if(map[4][6] ==9){
+        bx=5;
+        by=6;
+    }else{
+        bx=6;
+        by=6;
+    }
+    
+    //findgoalboxsmall();
+    findgoalboxsmallv1();
 
-    printmap(map); 
+    //findgoalboxbig();
 
+    //printmap(map); 
+    //*/
     return 0;
 }
 
@@ -233,7 +246,7 @@ void findgoalboxsmall(){
 }
 
 void findboxbig(){
-
+    int count=0;
     findtwo();
     printxy(x,y);
     printxy(bx1,by1);
@@ -259,15 +272,17 @@ void findboxbig(){
     }    
     
     printmap(mapone);
-    while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
+    while(count!=10){
+    //while((x!=bx1 || y!=by1 ) || (x!=bx2 || y!=by2 )){
         if(mapone[x][y]==1){
             break; //keepblock
         }else{
             move();
             printxy(x,y);
         }        
-        
+        count++;
     }    
+    printmap(mapone);
     checkprekeep();
     keep();
     printxy(x,y);    
@@ -311,18 +326,21 @@ void findgoalboxbig(){
     int two=0;
     two = checkmap2box(); 
     change2();
-    if(mapone[5][5]!=99){
-        mapone[5][5]=99;
+    /*
+    if(mapone[5][5]!=98){
+        mapone[5][5]=98;
     }
-    if(mapone[6][5]!=99){
-        mapone[6][5]=99;
+    if(mapone[6][5]!=98){
+        mapone[6][5]=98;
     }
-    if(mapone[5][7]!=99){
-        mapone[5][7]=99;
+    if(mapone[5][7]!=98){
+        mapone[5][7]=98;
     }
-    if(mapone[6][7]!=99){
-        mapone[6][7]=99;
+    if(mapone[6][7]!=98){
+        mapone[6][7]=98;
     }
+    */
+   
     if(two>1){
        for(int i=0;i<15;i++){
             changeone(bx,by);
@@ -330,8 +348,8 @@ void findgoalboxbig(){
         while(x!=bx || y!=by ){
         //while(count != 10){
             
-                move();
-                printxy(x,y);
+            move();
+            printxy(x,y);
             
             //count++;
         }
@@ -352,6 +370,7 @@ void findgoalboxbig(){
         }
     }
     printmap(mapone); 
+    /*
     if(map[5][5]!=9){
         mapone[5][5]=1;
     }
@@ -363,7 +382,7 @@ void findgoalboxbig(){
     }
     if(map[6][7]!=9){
         mapone[6][7]=1;
-    }
+    }*/
     printmap(mapone); 
     for(int i=0;i<15;i++){
             changetwo(bx1,by1,bx2,by2); 
@@ -382,6 +401,37 @@ void findgoalboxbig(){
     map[bx1][by1]=9;
     map[bx2][by2]=9; 
 }
+
+void findgoalboxsmallv1(){
+    
+    printxy(x,y);
+    printxy(bx,by);
+    for(int i=0;i<15;i++){
+        changeone(bx,by);
+    }  
+    printmap(mapone);
+
+    //int count =0;
+    while(x!=bx || y!=by)
+    //while(count != 20)
+    {        
+            move();
+            printxy(x,y);
+       // count++;
+    } 
+    
+    if(x==5){
+        preplace1(6,6);
+    }
+    if(x==6){
+        preplace1(5,6);
+    } 
+    printxy(x,y);
+    printf("\nplace box\n\n");
+    status = 0;
+    map[bx][by]=9;
+}
+
 ////////////////////////////// print
 void printmap(int map[][10]){
     printf("\n 0  1  2  3  4  5  6  7  8  9 \n\n");
@@ -1440,20 +1490,38 @@ void preplace1(int bx,int by){
     switch(checkp){
         case 0:
             printf(" goal in the front \n");
-            if(checkw == 6 || checkw == 9){
-                front();
-                front();
+            if(box2 == 0){            
+                if(checkw == 6 || checkw == 9){
+                    front();
+                    front();
+                }else{
+                checkbackbox1(x,y);   
+                }
             }else{
-               checkbackbox1(x,y);   
+                if(map[4][6]!=9 && map[7][6]!=9 ){
+                    front();
+                    front();
+                    front();
+                }else{
+                    checkbackbox1(x,y);   
+                }
             }                       
             break;
         case 1:
+
             printf(" goal in the left \n");
-            checkrightbox1(x,y);            
+            if(box2 == 0){   
+            checkrightbox1(x,y);     
+            }else{
+            }       
             break;
         case 2:
             printf(" goal in the right \n");
-            checkleftbox1(x,y);
+            if(box2 == 0){  
+                checkleftbox1(x,y);
+            }else{
+                checkleftbox1(x,y); 
+            }
             break;
         default:
             printf(" goal in the back \n");
@@ -1461,4 +1529,5 @@ void preplace1(int bx,int by){
     }
   
 }
+
 //*/
