@@ -61,17 +61,17 @@ int mapone[10][10] =  //changemap at
 
 int map[10][10] =
 {   //0 1 2 3 4 5 6 7 8 9
-	{1,1,1,1,1, 1,1,1,1,1},//0
-	{1,1,1,1,1, 6,9,1,1,1},//1
-	{1,1,1,1,1, 1,1,1,1,1},//2
-	{1,6,1,1,1, 1,1,1,1,1},//3
-	{1,1,1,1,1, 1,1,1,1,1},//4
+	{1,1, 1 ,1,1, 1,1, 1,1,1},//0
+	{1,1, 1 ,1,1, 1,6, 1 ,1,1},//1
+	{1,1, 1 ,1,1, 1,1, 9,1,1},//2
+	{1,1, 1 ,1,1, 1,1, 1,1,1},//3
+	{1,1, 6 ,6,1, 1,1, 1,1,1},//4
 
-	{1,1,1,6,6, 1,1,9,1,1},//5
-	{1,1,1,1,1, 1,1,1,1,1},//6
-	{1,9,1,1,1, 1,9,1,1,1},//7
-	{1,1,1,1,1, 1,1,1,1,1},//8
-	{1,1,1,1,1, 1,1,1,1,1} //9
+	{1,1, 9 ,1,1, 1,1 ,9,6,1},//5
+	{1,1, 1 ,1,1, 1,1, 1,1,1},//6
+	{1,1, 1 ,1,1, 1,1, 1,1,1},//7
+	{1,1, 9 ,1,1, 1,1, 1,1,1},//8
+	{1,1, 1 ,1,1, 1,1, 1,1,1} //9
 };
 /*
 void checkblock(int x,int y);
@@ -145,8 +145,10 @@ int main(){
     
     findboxsmall();
 
-    bx=7;
-    by=2;
+    // bx=7;
+    // by=2;
+    bx=1;
+    by=7;
 
     //find goal
     findgoalboxsmall();
@@ -156,8 +158,10 @@ int main(){
     //find boxmall 1 : Round 2
     findboxsmall();
 
-    bx=1;
-    by=7;
+    // bx=1;
+    // by=7;
+    bx=7;
+    by=2;
 
     //find goal
     findgoalboxsmall();
@@ -169,22 +173,22 @@ int main(){
     
     findboxbig();
     
-    // bx1=5;
-    // by1=6;
-    // bx2=6;
-    // by2=6;
-    if(map[4][6] ==9){
-        bx=5;
-        by=6;
-    }else{
-        bx=6;
-        by=6;
-    }
+    bx1=5;
+    by1=6;
+    bx2=6;
+    by2=6;
+    // if(map[4][6] ==9){
+    //     bx=5;
+    //     by=6;
+    // }else{
+    //     bx=6;
+    //     by=6;
+    // }
     
     //findgoalboxsmall();
-    findgoalboxsmallv1();
+   // findgoalboxsmallv1();
 
-    //findgoalboxbig();
+    findgoalboxbig();
 
     //printmap(map); 
     //*/
@@ -326,20 +330,20 @@ void findgoalboxbig(){
     int two=0;
     two = checkmap2box(); 
     change2();
-    /*
-    if(mapone[5][5]!=98){
-        mapone[5][5]=98;
+    
+    if(mapone[5][5]!=99){
+        mapone[5][5]=99;
     }
-    if(mapone[6][5]!=98){
-        mapone[6][5]=98;
+    if(mapone[6][5]!=99){
+        mapone[6][5]=99;
     }
-    if(mapone[5][7]!=98){
-        mapone[5][7]=98;
+    if(mapone[5][7]!=99){
+        mapone[5][7]=99;
     }
-    if(mapone[6][7]!=98){
-        mapone[6][7]=98;
+    if(mapone[6][7]!=99){
+        mapone[6][7]=99;
     }
-    */
+    
    
     if(two>1){
        for(int i=0;i<15;i++){
@@ -370,7 +374,7 @@ void findgoalboxbig(){
         }
     }
     printmap(mapone); 
-    /*
+    
     if(map[5][5]!=9){
         mapone[5][5]=1;
     }
@@ -382,7 +386,7 @@ void findgoalboxbig(){
     }
     if(map[6][7]!=9){
         mapone[6][7]=1;
-    }*/
+    }
     printmap(mapone); 
     for(int i=0;i<15;i++){
             changetwo(bx1,by1,bx2,by2); 
